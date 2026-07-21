@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan A · 赛事日程</title>
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --card: #ffffff;
+    --ink: #1d1d1f;
+    --sub: #6e6e73;
+    --line: #d2d2d7;
+    --accent: #0071e3;
+    --buffer: #8e8e93;
+    --milestone: #34c759;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.05);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    padding: 48px 20px 80px;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+
+  header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  h1 {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .subtitle {
+    color: var(--sub);
+    font-size: 15px;
+    margin-top: 8px;
+  }
+
+  /* language toggle */
+  .lang-toggle {
+    display: inline-flex;
+    background: #e8e8ed;
+    border-radius: 980px;
+    padding: 3px;
+    margin-top: 22px;
+    gap: 2px;
+  }
+  .lang-toggle button {
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--sub);
+    padding: 7px 20px;
+    border-radius: 980px;
+    cursor: pointer;
+    transition: all .25s ease;
+  }
+  .lang-toggle button.active {
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  }
+
+  /* timeline */
+  .timeline {
+    position: relative;
+    margin-top: 8px;
+    padding-left: 28px;
+  }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    background: var(--line);
+  }
+  .item {
+    position: relative;
+    margin-bottom: 18px;
+  }
+  .dot {
+    position: absolute;
+    left: -28px;
+    top: 22px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 3px solid var(--accent);
+    transform: translateX(-1px);
+  }
+  .item.buffer .dot { border-color: var(--buffer); }
+  .item.milestone .dot { border-color: var(--milestone); }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 16px 40px rgba(0,0,0,0.08);
+  }
+  .item.buffer .card {
+    background: repeating-linear-gradient(45deg, #fbfbfd, #fbfbfd 10px, #f2f2f4 10px, #f2f2f4 20px);
+    box-shadow: none;
+    border: 1px solid var(--line);
+  }
+  .date {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .item.buffer .date { color: var(--buffer); }
+  .item.milestone .date { color: var(--milestone); }
+  .desc {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .note-badge {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--sub);
+    background: #f0f0f3;
+    border-radius: 6px;
+    padding: 2px 8px;
+    margin-top: 8px;
+  }
+
+  footer {
+    margin-top: 36px;
+    padding: 18px 20px;
+    background: #fff9ec;
+    border: 1px solid #f5e6c0;
+    border-radius: 14px;
+    font-size: 14px;
+    color: #8a6d1a;
+  }
+  footer .flabel { font-weight: 600; }
+
+  .plan-tag {
+    font-size: 13px;
+    color: var(--sub);
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="title"></h1>
+    <div class="subtitle" id="subtitle"></div>
+    <div class="lang-toggle">
+      <button id="btn-zh" class="active" onclick="setLang('zh')">中文</button>
+      <button id="btn-en" onclick="setLang('en')">English</button>
+    </div>
+  </header>
+
+  <div class="timeline" id="timeline"></div>
+
+  <footer>
+    <span class="flabel" id="note-label"></span>
+    <span id="note-text"></span>
+  </footer>
+</div>
+
+<script>
+const DATA = {
+  zh: {
+    title: "Plan A · 赛事日程",
+    subtitle: "基准方案，不考虑 oral",
+    noteLabel: "备注：",
+    noteText: "8/22–8/24 为缓冲，处理冒烟期间暴露的问题 / 队伍最后适配。",
+    items: [
+      { date: "7/20", type: "milestone", desc: "正式比赛群开放，备赛开启" },
+      { date: "8/7",  type: "milestone", desc: "报名截止" },
+      { date: "8/10–8/12", type: "", desc: "队伍对接群开放，私有仓库对接，比赛模板发布" },
+      { date: "8/13–8/21", type: "", desc: "环境适配 + 冒烟测试（9 天）" },
+      { date: "8/22–8/24", type: "buffer", desc: "缓冲期：处理冒烟期间暴露的问题 / 队伍最后适配" },
+      { date: "8月最后一周", type: "milestone", desc: "正式提交窗口（一周）" },
+      { date: "九月初", type: "", desc: "排名和成绩复核" },
+      { date: "9 月中", type: "milestone", desc: "排名和成绩公布" },
+      { date: "9–10 月", type: "", desc: "获奖选手提供必要信息" }
+    ]
+  },
+  en: {
+    title: "Plan A · Competition Schedule",
+    subtitle: "Baseline plan, oral not considered",
+    noteLabel: "Note: ",
+    noteText: "Aug 22–24 is a buffer to resolve issues surfaced during smoke testing / final team adjustments.",
+    items: [
+      { date: "Jul 20", type: "milestone", desc: "Official competition group opens; preparation begins" },
+      { date: "Aug 7",  type: "milestone", desc: "Registration deadline" },
+      { date: "Aug 10–12", type: "", desc: "Team liaison group opens, private repo integration, contest template released" },
+      { date: "Aug 13–21", type: "", desc: "Environment setup + smoke testing (9 days)" },
+      { date: "Aug 22–24", type: "buffer", desc: "Buffer: resolve smoke-test issues / final team adjustments" },
+      { date: "Last week of Aug", type: "milestone", desc: "Official submission window (one week)" },
+      { date: "Early Sep", type: "", desc: "Ranking & results review" },
+      { date: "Mid-Sep", type: "milestone", desc: "Ranking & results announced" },
+      { date: "Sep–Oct", type: "", desc: "Winners provide required information" }
+    ]
+  }
+};
+
+function render(lang) {
+  const d = DATA[lang];
+  document.getElementById("title").textContent = d.title;
+  document.getElementById("subtitle").textContent = d.subtitle;
+  document.getElementById("note-label").textContent = d.noteLabel;
+  document.getElementById("note-text").textContent = d.noteText;
+  const tl = document.getElementById("timeline");
+  tl.innerHTML = "";
+  d.items.forEach(it => {
+    const el = document.createElement("div");
+    el.className = "item " + (it.type || "");
+    el.innerHTML = `
+      <div class="dot"></div>
+      <div class="card">
+        <div class="date">${it.date}</div>
+        <div class="desc">${it.desc}</div>
+      </div>`;
+    tl.appendChild(el);
+  });
+}
+
+function setLang(lang) {
+  document.documentElement.lang = lang;
+  document.getElementById("btn-zh").classList.toggle("active", lang === "zh");
+  document.getElementById("btn-en").classList.toggle("active", lang === "en");
+  render(lang);
+}
+
+setLang("zh");
+</script>
+</body>
+</html>
