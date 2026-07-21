@@ -163,7 +163,6 @@
 <div class="wrap">
   <header>
     <h1 id="title"></h1>
-    <div class="subtitle" id="subtitle"></div>
     <div class="lang-toggle">
       <button id="btn-zh" class="active" onclick="setLang('zh')">中文</button>
       <button id="btn-en" onclick="setLang('en')">English</button>
@@ -171,20 +170,12 @@
   </header>
 
   <div class="timeline" id="timeline"></div>
-
-  <footer>
-    <span class="flabel" id="note-label"></span>
-    <span id="note-text"></span>
-  </footer>
 </div>
 
 <script>
 const DATA = {
   zh: {
-    title: "Plan A · 赛事日程",
-    subtitle: "基准方案，不考虑 oral",
-    noteLabel: "备注：",
-    noteText: "8/22–8/24 为缓冲，处理冒烟期间暴露的问题 / 队伍最后适配。",
+    title: "WebRetriever Challenge 2026",
     items: [
       { date: "7/20", type: "milestone", desc: "正式比赛群开放，备赛开启" },
       { date: "8/7",  type: "milestone", desc: "报名截止" },
@@ -198,10 +189,7 @@ const DATA = {
     ]
   },
   en: {
-    title: "Plan A · Competition Schedule",
-    subtitle: "Baseline plan, oral not considered",
-    noteLabel: "Note: ",
-    noteText: "Aug 22–24 is a buffer to resolve issues surfaced during smoke testing / final team adjustments.",
+    title: "WebRetriever Challenge 2026",
     items: [
       { date: "Jul 20", type: "milestone", desc: "Official competition group opens; preparation begins" },
       { date: "Aug 7",  type: "milestone", desc: "Registration deadline" },
@@ -219,9 +207,6 @@ const DATA = {
 function render(lang) {
   const d = DATA[lang];
   document.getElementById("title").textContent = d.title;
-  document.getElementById("subtitle").textContent = d.subtitle;
-  document.getElementById("note-label").textContent = d.noteLabel;
-  document.getElementById("note-text").textContent = d.noteText;
   const tl = document.getElementById("timeline");
   tl.innerHTML = "";
   d.items.forEach(it => {
